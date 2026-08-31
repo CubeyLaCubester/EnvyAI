@@ -1,46 +1,45 @@
-!DOCTYPE html
-html lang=en
-head
-  meta charset=UTF-8
-  meta name=viewport content=width=device-width, initial-scale=1.0
-  titleMy Personal Groq AItitle
-  style
-     { box-sizing border-box; font-family system-ui, -apple-system, sans-serif; }
-    body { max-width 650px; margin 30px auto; padding 0 15px; background-color #f7f9fc; color #333; }
-    .card { background white; padding 20px; border-radius 8px; box-shadow 0 2px 8px rgba(0,0,0,0.08); }
-    h2 { margin-top 0; }
-    .key-section { margin-bottom 15px; }
-    input[type=password], input[type=text] { width 100%; padding 10px; margin-top 5px; border 1px solid #ccc; border-radius 4px; }
-    #chat-box { height 350px; border 1px solid #e2e8f0; border-radius 6px; overflow-y auto; padding 12px; margin 15px 0; background #fafafa; }
-    .msg { margin-bottom 10px; padding 8px 12px; border-radius 6px; }
-    .user { background #e3f2fd; align-self flex-end; }
-    .ai { background #ffffff; border 1px solid #e0e0e0; }
-    .input-row { display flex; gap 8px; }
-    button { padding 10px 18px; background #0066cc; color white; border none; border-radius 4px; cursor pointer; }
-    buttonhover { background #0052a3; }
-  style
-head
-body
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Personal Groq AI</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { max-width: 650px; margin: 30px auto; padding: 0 15px; background-color: #f7f9fc; color: #333; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    h2 { margin-top: 0; }
+    .key-section { margin-bottom: 15px; }
+    input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    #chat-box { height: 350px; border: 1px solid #e2e8f0; border-radius: 6px; overflow-y: auto; padding: 12px; margin: 15px 0; background: #fafafa; }
+    .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 6px; }
+    .user { background: #e3f2fd; }
+    .ai { background: #ffffff; border: 1px solid #e0e0e0; }
+    .input-row { display: flex; gap: 8px; }
+    button { padding: 10px 18px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0052a3; }
+  </style>
+</head>
+<body>
 
-div class=card
-  h2Personal Groq AI Assistanth2
+<div class="card">
+  <h2>Personal Groq AI Assistant</h2>
   
-  div class=key-section
-    label for=apiKeystrongGroq API Keystronglabel
-    input type=password id=apiKey placeholder=gsk_... onchange=saveKey()
-  div
+  <div class="key-section">
+    <label for="apiKey"><strong>Groq API Key:</strong></label>
+    <input type="password" id="apiKey" placeholder="gsk_..." onchange="saveKey()">
+  </div>
 
-  div id=chat-boxdiv
+  <div id="chat-box"></div>
 
-  div class=input-row
-    input type=text id=userInput placeholder=Ask your AI something... onkeydown=if(event.key==='Enter') sendMessage()
-    button onclick=sendMessage()Sendbutton
-  div
-div
+  <div class="input-row">
+    <input type="text" id="userInput" placeholder="Ask your AI something..." onkeydown="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
 
-script
-   Save key in browser local storage so you don't have to enter it every time
-  document.getElementById('apiKey').value = localStorage.getItem('user_groq_key')  '';
+<script>
+  document.getElementById('apiKey').value = localStorage.getItem('user_groq_key') || '';
 
   function saveKey() {
     const key = document.getElementById('apiKey').value;
@@ -54,25 +53,25 @@ script
     const prompt = promptInput.value.trim();
 
     if (!keyInput) {
-      alert(Please enter your Groq API key first.);
+      alert("Please enter your Groq API key first.");
       return;
     }
     if (!prompt) return;
 
-    chatBox.innerHTML += `div class=msg userstrongYoustrong ${prompt}div`;
+    chatBox.innerHTML += `<div class="msg user"><strong>You:</strong> ${prompt}</div>`;
     promptInput.value = '';
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-      const response = await fetch('httpsapi.groq.comopenaiv1chatcompletions', {
-        method 'POST',
-        headers {
-          'Authorization' `Bearer ${keyInput}`,
-          'Content-Type' 'applicationjson'
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${keyInput}`,
+          'Content-Type': 'application/json'
         },
-        body JSON.stringify({
-          model 'llama-3.3-70b-versatile',
-          messages [{ role 'user', content prompt }]
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }]
         })
       });
 
@@ -80,17 +79,17 @@ script
       
       if (data.choices && data.choices[0]) {
         const reply = data.choices[0].message.content;
-        chatBox.innerHTML += `div class=msg aistrongAIstrong ${reply}div`;
+        chatBox.innerHTML += `<div class="msg ai"><strong>AI:</strong> ${reply}</div>`;
       } else {
-        chatBox.innerHTML += `div class=msg aistrongErrorstrong ${data.error.message  'Failed to get response.'}div`;
+        chatBox.innerHTML += `<div class="msg ai"><strong>Error:</strong> ${data.error?.message || 'Failed to get response.'}</div>`;
       }
     } catch (err) {
-      chatBox.innerHTML += `div class=msg aistrongNetwork Errorstrong Connection blocked or failed.div`;
+      chatBox.innerHTML += `<div class="msg ai"><strong>Network Error:</strong> Connection blocked or failed.</div>`;
     }
     
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-script
+</script>
 
-body
-html
+</body>
+</html>
